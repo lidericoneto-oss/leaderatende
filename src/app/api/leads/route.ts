@@ -34,8 +34,10 @@ export async function POST(request: NextRequest) {
 
   const diagnosis = calculateDiagnosis(data);
 
-  const lead = await prisma.lead.create({
-    data: {
+  let lead;
+  try {
+    lead = await prisma.lead.create({
+      data: {
       companyName: data.companyName,
       responsibleName: data.responsibleName,
       segment: data.segment,
@@ -83,9 +85,16 @@ export async function POST(request: NextRequest) {
       priorities: JSON.stringify(diagnosis.priorities),
       recommendations: JSON.stringify(diagnosis.recommendations),
 
-      status: "NOVO",
-    },
-  });
+        status: "NOVO",
+      },
+    });
+  } catch (err) {
+    console.error("Failed to create lead:", err);
+    return NextResponse.json(
+      { error: "debug", detail: err instanceof Error ? err.message : String(err) },
+      { status: 500 }
+    );
+  }
 
   return NextResponse.json({ id: lead.id });
 }
