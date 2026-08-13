@@ -26,7 +26,7 @@ export function ScoreGauge({ score, classification }: ScoreGaugeProps) {
           cy="80"
           r={radius}
           fill="none"
-          stroke="var(--border)"
+          stroke="var(--dark-border)"
           strokeWidth="12"
         />
         <circle
@@ -43,8 +43,8 @@ export function ScoreGauge({ score, classification }: ScoreGaugeProps) {
         />
       </svg>
       <div className="absolute flex flex-col items-center">
-        <span className="text-4xl font-bold text-ink">{score}</span>
-        <span className="text-xs text-ink-soft">de 100</span>
+        <span className="font-display text-4xl text-white">{score}</span>
+        <span className="text-xs text-dark-ink-soft">de 100</span>
       </div>
     </div>
   );

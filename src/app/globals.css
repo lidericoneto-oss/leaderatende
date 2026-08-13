@@ -1,16 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f7fb;
+  --background: #f7f6f4;
   --surface: #ffffff;
-  --ink: #0b1120;
-  --ink-soft: #4b5165;
-  --border: #e4e4ec;
-  --brand: #3730a3;
-  --brand-light: #eef2ff;
-  --accent: #0d9488;
+  --ink: #131211;
+  --ink-soft: #56504a;
+  --border: #e7e3de;
+  --brand: #e8730c;
+  --brand-dark: #c25e07;
+  --brand-light: #fdece0;
+  --dark: #0a0a0a;
+  --dark-surface: #171513;
+  --dark-border: #2c2924;
+  --dark-ink-soft: #b8b2aa;
   --critico: #dc2626;
-  --melhorar: #d97706;
+  --melhorar: #ca8a04;
   --boa-base: #2563eb;
   --estruturado: #059669;
 }
@@ -22,14 +26,19 @@
   --color-ink-soft: var(--ink-soft);
   --color-border: var(--border);
   --color-brand: var(--brand);
+  --color-brand-dark: var(--brand-dark);
   --color-brand-light: var(--brand-light);
-  --color-accent: var(--accent);
+  --color-dark: var(--dark);
+  --color-dark-surface: var(--dark-surface);
+  --color-dark-border: var(--dark-border);
+  --color-dark-ink-soft: var(--dark-ink-soft);
   --color-critico: var(--critico);
   --color-melhorar: var(--melhorar);
   --color-boa-base: var(--boa-base);
   --color-estruturado: var(--estruturado);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-anton);
 }
 
 body {

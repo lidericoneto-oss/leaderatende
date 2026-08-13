@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ProgressBar } from "@/components/ProgressBar";
 import { ProcessingScreen } from "@/components/ProcessingScreen";
+import { Logo } from "@/components/Logo";
 import { STEP_TITLES, TOTAL_STEPS } from "@/lib/quiz-data";
 import { isValidEmail, isValidPhone } from "@/lib/validation";
 import type { QuizData } from "@/types/lead";
@@ -177,8 +178,8 @@ export default function DiagnosticoPage() {
 
   return (
     <div className="mx-auto min-h-screen max-w-2xl px-5 py-10 sm:py-16">
-      <Link href="/" className="text-sm font-semibold text-brand">
-        LeaderAtende
+      <Link href="/">
+        <Logo />
       </Link>
 
       <div className="mt-8">

@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { AGENCY_NAME, buildWhatsAppLink } from "@/lib/config";
+import { buildWhatsAppLink } from "@/lib/config";
 import { ScoreGauge } from "@/components/report/ScoreGauge";
 import { PillarBar } from "@/components/report/PillarBar";
+import { Logo } from "@/components/Logo";
 import { describePillar } from "@/lib/scoring";
 import type { Classification, Pillar, Priority } from "@/types/lead";
 
@@ -80,18 +81,18 @@ export default async function RelatorioPage({
 
   return (
     <div className="min-h-screen pb-24">
-      <header className="mx-auto flex max-w-4xl items-center justify-between px-5 py-6">
-        <Link href="/" className="text-sm font-semibold text-brand">
-          {AGENCY_NAME}
-        </Link>
-      </header>
+      <div className="bg-dark">
+        <header className="mx-auto flex max-w-4xl items-center justify-between px-5 py-6">
+          <Link href="/">
+            <Logo inverted />
+          </Link>
+        </header>
 
-      <main className="mx-auto max-w-4xl px-5">
-        <section className="text-center">
-          <p className="text-xs font-semibold uppercase tracking-wide text-brand">
+        <section className="mx-auto max-w-4xl px-5 pb-14 text-center">
+          <p className="text-xs font-semibold tracking-wide text-brand uppercase">
             Diagnóstico de Marketing
           </p>
-          <h1 className="mt-2 text-2xl font-semibold text-ink sm:text-3xl">
+          <h1 className="font-display mt-2 text-3xl tracking-tight text-white uppercase sm:text-4xl">
             {lead.companyName}
           </h1>
 
@@ -102,12 +103,14 @@ export default async function RelatorioPage({
             >
               {classification}
             </span>
-            <p className="max-w-md text-sm text-ink-soft">
+            <p className="max-w-md text-sm text-dark-ink-soft">
               {classificationSummary}
             </p>
           </div>
         </section>
+      </div>
 
+      <main className="mx-auto max-w-4xl px-5">
         <section className="mt-16">
           <h2 className="text-lg font-semibold text-ink">
             Seu resultado por pilar

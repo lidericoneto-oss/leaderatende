@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     console.error("Failed to create lead:", err);
     return NextResponse.json(
-      { error: "debug", detail: err instanceof Error ? err.message : String(err) },
+      { error: "Não foi possível salvar seu diagnóstico. Tente novamente." },
       { status: 500 }
     );
   }

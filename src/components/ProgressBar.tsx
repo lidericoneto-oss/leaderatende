@@ -24,7 +24,7 @@ export function ProgressBar({
           style={{ width: `${percent}%` }}
         />
       </div>
-      <h2 className="mt-4 text-xl font-semibold text-ink sm:text-2xl">
+      <h2 className="font-display mt-4 text-2xl tracking-tight text-ink uppercase sm:text-3xl">
         {stepTitle}
       </h2>
     </div>
