@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Lead {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Etapa 1 — Sobre a empresa
+  companyName      String
+  responsibleName  String
+  segment          String
+  city             String
+  website          String?
+  instagram        String?
+  facebook         String?
+  whatsappBusiness String
+  employeeCount    String
+  companyStage     String
+
+  // Etapa 2 — Presença digital
+  channels              String // JSON string[]
+  marketingResponsible  String
+  postFrequency         String
+  adsInvestment         String
+
+  // Etapa 3 — Objetivos
+  objectives        String // JSON string[]
+  successDefinition String?
+
+  // Etapa 4 — Desafios
+  challenges String // JSON string[]
+
+  // Etapa 5 — Autoavaliação (1-5)
+  selfProfessionalism Int
+  selfClarity         Int
+  selfDifferentiation Int
+  selfSalesConversion Int
+  selfStrategy        Int
+
+  // Etapa 6 — Contato
+  contactName  String
+  contactEmail String
+  contactPhone String
+  consent      Boolean @default(false)
+
+  // Diagnóstico calculado
+  scoreGeneral         Int
+  scorePositioning     Int
+  scoreCommunication   Int
+  scoreDigitalPresence Int
+  scoreContent         Int
+  scoreConversion      Int
+  scoreStrategy        Int
+  classification       String
+  priorities           String // JSON
+  recommendations      String // JSON
+
+  // Comercial
+  status String @default("NOVO")
+
+  @@map("leads")
+}
