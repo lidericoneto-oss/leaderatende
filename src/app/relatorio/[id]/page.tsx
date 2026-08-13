@@ -4,9 +4,16 @@ import { prisma } from "@/lib/prisma";
 import { buildWhatsAppLink } from "@/lib/config";
 import { ScoreGauge } from "@/components/report/ScoreGauge";
 import { PillarBar } from "@/components/report/PillarBar";
+import { InstagramUpload } from "@/components/report/InstagramUpload";
 import { Logo } from "@/components/Logo";
-import { describePillar } from "@/lib/scoring";
-import type { Classification, Pillar, Priority } from "@/types/lead";
+import { applyInstagramAdjustments, describePillar } from "@/lib/scoring";
+import type {
+  Classification,
+  InstagramAdjustments,
+  InstagramAnalysis,
+  Pillar,
+  Priority,
+} from "@/types/lead";
 
 const CLASSIFICATION_BADGE: Record<Classification, string> = {
   "CRÍTICO": "bg-red-50 text-critico border-red-200",
@@ -53,17 +60,38 @@ export default async function RelatorioPage({
     ["strategy", "Estratégia", lead.scoreStrategy],
   ];
 
-  const pillars: Pillar[] = rawPillars.map(([key, label, score]) => ({
+  const basePillars: Pillar[] = rawPillars.map(([key, label, score]) => ({
     key,
     label,
     score,
     description: describePillar(key, score),
   }));
 
-  const priorities: Priority[] = JSON.parse(lead.priorities);
+  let pillars = basePillars;
+  let scoreGeneral = lead.scoreGeneral;
+  let classification = lead.classification as Classification;
+  let priorities: Priority[] = JSON.parse(lead.priorities);
+
+  const instagramAdjustments: InstagramAdjustments | null = lead.instagramAdjustments
+    ? JSON.parse(lead.instagramAdjustments)
+    : null;
+
+  if (instagramAdjustments) {
+    const adjusted = applyInstagramAdjustments(basePillars, instagramAdjustments);
+    pillars = adjusted.pillars;
+    scoreGeneral = adjusted.scoreGeneral;
+    classification = adjusted.classification;
+    priorities = adjusted.priorities;
+  }
+
   const recommendations: string[] = JSON.parse(lead.recommendations);
 
-  const classification = lead.classification as Classification;
+  const initialInstagramAnalysis: InstagramAnalysis | null = lead.instagramAnalysis
+    ? {
+        ...JSON.parse(lead.instagramAnalysis),
+        adjustments: instagramAdjustments ?? {},
+      }
+    : null;
 
   const classificationSummary =
     {
@@ -76,8 +104,8 @@ export default async function RelatorioPage({
         "A empresa já possui uma presença digital estruturada, com oportunidades de otimização e escala.",
     }[classification] ?? "";
 
-  const whatsappSpecialistMessage = `Olá! Acabei de fazer o diagnóstico de marketing da ${lead.companyName} e tive o resultado ${lead.scoreGeneral}/100. Gostaria de conversar sobre os próximos passos.`;
-  const whatsappReceiveMessage = `Olá! Gostaria de receber o diagnóstico da ${lead.companyName} (resultado ${lead.scoreGeneral}/100) pelo WhatsApp.`;
+  const whatsappSpecialistMessage = `Olá! Acabei de fazer o diagnóstico de marketing da ${lead.companyName} e tive o resultado ${scoreGeneral}/100. Gostaria de conversar sobre os próximos passos.`;
+  const whatsappReceiveMessage = `Olá! Gostaria de receber o diagnóstico da ${lead.companyName} (resultado ${scoreGeneral}/100) pelo WhatsApp.`;
 
   return (
     <div className="min-h-screen pb-24">
@@ -97,7 +125,7 @@ export default async function RelatorioPage({
           </h1>
 
           <div className="mt-8 flex flex-col items-center gap-4">
-            <ScoreGauge score={lead.scoreGeneral} classification={classification} />
+            <ScoreGauge score={scoreGeneral} classification={classification} />
             <span
               className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${CLASSIFICATION_BADGE[classification]}`}
             >
@@ -127,6 +155,8 @@ export default async function RelatorioPage({
             ))}
           </div>
         </section>
+
+        <InstagramUpload leadId={id} initialAnalysis={initialInstagramAnalysis} />
 
         <section className="mt-16">
           <h2 className="text-lg font-semibold text-ink">

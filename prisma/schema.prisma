@@ -65,5 +65,10 @@ model Lead {
   // Comercial
   status String @default("NOVO")
 
+  // Análise do print do Instagram (IA)
+  instagramAnalysis    String? // JSON: { summary, strengths[], improvements[] }
+  instagramAdjustments String? // JSON: Partial<Record<PillarKey, number>>
+  instagramAnalyzedAt  DateTime?
+
   @@map("leads")
 }

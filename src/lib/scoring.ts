@@ -1,6 +1,7 @@
 import type {
   Classification,
   DiagnosisResult,
+  InstagramAdjustments,
   Pillar,
   PillarKey,
   Priority,
@@ -363,6 +364,43 @@ function buildRecommendations(data: QuizData, pillars: Pillar[]): string[] {
   }
 
   return actions.slice(0, 5);
+}
+
+const MAX_INSTAGRAM_ADJUSTMENT = 15;
+
+export function applyInstagramAdjustments(
+  pillars: Pillar[],
+  adjustments: InstagramAdjustments
+): Pick<
+  DiagnosisResult,
+  "pillars" | "scoreGeneral" | "classification" | "classificationSummary" | "priorities"
+> {
+  const adjustedPillars: Pillar[] = pillars.map((pillar) => {
+    const delta = clamp(
+      adjustments[pillar.key] ?? 0,
+      -MAX_INSTAGRAM_ADJUSTMENT,
+      MAX_INSTAGRAM_ADJUSTMENT
+    );
+    const score = clamp(pillar.score + delta);
+    return {
+      ...pillar,
+      score,
+      description: PILLAR_DESCRIPTIONS[pillar.key][bandOf(score)],
+    };
+  });
+
+  const scoreGeneral = clamp(
+    adjustedPillars.reduce((sum, p) => sum + p.score, 0) / adjustedPillars.length
+  );
+  const { classification, summary } = classify(scoreGeneral);
+
+  return {
+    pillars: adjustedPillars,
+    scoreGeneral,
+    classification,
+    classificationSummary: summary,
+    priorities: buildPriorities(adjustedPillars),
+  };
 }
 
 export function calculateDiagnosis(data: QuizData): DiagnosisResult {

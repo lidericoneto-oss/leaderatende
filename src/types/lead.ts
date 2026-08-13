@@ -132,6 +132,15 @@ export interface DiagnosisResult {
   recommendations: string[];
 }
 
+export type InstagramAdjustments = Partial<Record<PillarKey, number>>;
+
+export interface InstagramAnalysis {
+  summary: string;
+  strengths: string[];
+  improvements: string[];
+  adjustments: InstagramAdjustments;
+}
+
 export const LEAD_STATUSES = [
   "NOVO",
   "ANALISADO",
