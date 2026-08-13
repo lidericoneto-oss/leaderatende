@@ -1,4 +1,4 @@
 -- AlterTable
-ALTER TABLE "leads" ADD COLUMN     "instagramAnalysis" TEXT,
-ADD COLUMN     "instagramAdjustments" TEXT,
-ADD COLUMN     "instagramAnalyzedAt" TIMESTAMP(3);
+ALTER TABLE "leads" ADD COLUMN IF NOT EXISTS "instagramAnalysis" TEXT,
+ADD COLUMN IF NOT EXISTS "instagramAdjustments" TEXT,
+ADD COLUMN IF NOT EXISTS "instagramAnalyzedAt" TIMESTAMP(3);
