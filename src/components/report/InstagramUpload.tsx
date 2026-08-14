@@ -193,7 +193,7 @@ export function InstagramUpload({ leadId, initialAnalysis, whatsappHref }: Props
               />
               <label
                 htmlFor="instagram-print-input"
-                className={`inline-flex cursor-pointer items-center rounded-lg border border-border px-5 py-2.5 text-sm font-semibold text-ink transition hover:border-brand hover:text-brand ${
+                className={`inline-flex cursor-pointer items-center rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand/90 ${
                   loading ? "pointer-events-none opacity-60" : ""
                 }`}
               >
