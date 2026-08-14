@@ -1,8 +1,52 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Resend } from "resend";
 import { prisma } from "@/lib/prisma";
+import { SITE_URL } from "@/lib/config";
 import { calculateDiagnosis } from "@/lib/scoring";
 import { isValidEmail, isValidPhone } from "@/lib/validation";
 import type { QuizData } from "@/types/lead";
+
+const NOTIFY_TO = "liderico.neto@gmail.com";
+
+async function notifyCompletion(lead: {
+  id: string;
+  companyName: string;
+  responsibleName: string;
+  contactEmail: string;
+  contactPhone: string;
+  scoreGeneral: number;
+  classification: string;
+}) {
+  if (!process.env.RESEND_API_KEY) return;
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const reportUrl = `${SITE_URL}/relatorio/${lead.id}`;
+
+  try {
+    await resend.emails.send({
+      from: "LeaderAtende <onboarding@resend.dev>",
+      to: NOTIFY_TO,
+      subject: `Diagnóstico concluído: ${lead.companyName} (${lead.scoreGeneral}/100)`,
+      html: `
+        <div style="font-family:sans-serif;font-size:14px;color:#111;">
+          <p><strong>${lead.companyName}</strong> concluiu o diagnóstico.</p>
+          <table cellspacing="0" cellpadding="0">
+            <tr><td style="padding:4px 12px 4px 0;color:#6b7280;">Responsável</td><td style="padding:4px 0;">${lead.responsibleName}</td></tr>
+            <tr><td style="padding:4px 12px 4px 0;color:#6b7280;">E-mail</td><td style="padding:4px 0;">${lead.contactEmail}</td></tr>
+            <tr><td style="padding:4px 12px 4px 0;color:#6b7280;">WhatsApp</td><td style="padding:4px 0;">${lead.contactPhone}</td></tr>
+            <tr><td style="padding:4px 12px 4px 0;color:#6b7280;">Resultado</td><td style="padding:4px 0;">${lead.scoreGeneral}/100 — ${lead.classification}</td></tr>
+            <tr><td style="padding:4px 12px 4px 0;color:#6b7280;">ID</td><td style="padding:4px 0;">${lead.id}</td></tr>
+          </table>
+          <p style="margin-top:16px;">
+            <a href="${reportUrl}" style="display:inline-block;background:#e8730c;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600;">Ver diagnóstico completo</a>
+          </p>
+        </div>
+      `,
+    });
+  } catch (err) {
+    console.error("Completion notify email failed:", err);
+  }
+}
 
 export async function POST(request: NextRequest) {
   let data: QuizData;
@@ -95,6 +139,16 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+
+  await notifyCompletion({
+    id: lead.id,
+    companyName: lead.companyName,
+    responsibleName: lead.responsibleName,
+    contactEmail: lead.contactEmail,
+    contactPhone: lead.contactPhone,
+    scoreGeneral: lead.scoreGeneral,
+    classification: lead.classification,
+  });
 
   return NextResponse.json({ id: lead.id });
 }

@@ -6,7 +6,10 @@ import type { InstagramAdjustments, InstagramAnalysis, PillarKey } from "@/types
 const ALLOWED_MEDIA_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"] as const;
 type AllowedMediaType = (typeof ALLOWED_MEDIA_TYPES)[number];
 
-const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+// A Vercel rejeita o payload da função (413) acima de ~4.5MB de corpo de
+// requisição; o cliente já comprime a imagem antes de enviar, então esse
+// limite é só uma proteção extra caso a rota seja chamada diretamente.
+const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 
 const ADJUSTABLE_PILLARS: PillarKey[] = [
   "positioning",
@@ -139,7 +142,7 @@ export async function POST(
 
   if (base64ByteLength(imageBase64) > MAX_IMAGE_BYTES) {
     return NextResponse.json(
-      { error: "Imagem muito grande. O limite é 5MB." },
+      { error: "Imagem muito grande. O limite é 4MB." },
       { status: 400 }
     );
   }

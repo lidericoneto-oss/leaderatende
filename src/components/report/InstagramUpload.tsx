@@ -5,17 +5,46 @@ import { useRouter } from "next/navigation";
 import type { InstagramAnalysis } from "@/types/lead";
 
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-const MAX_FILE_BYTES = 5 * 1024 * 1024;
+const MAX_FILE_BYTES = 15 * 1024 * 1024;
+const MAX_DIMENSION = 1600;
+const JPEG_QUALITY = 0.85;
 
-function fileToBase64(file: File): Promise<string> {
+// Redimensiona e recomprime como JPEG antes de enviar: prints de celular
+// (sobretudo iPhone) costumam vir grandes o bastante para estourar o
+// limite de payload das funções da Vercel (~4.5MB) depois de virar base64.
+function compressImage(file: File): Promise<{ base64: string; mediaType: string }> {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      resolve(result.split(",")[1] ?? "");
+    const objectUrl = URL.createObjectURL(file);
+    const img = new Image();
+
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+        const ratio = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      URL.revokeObjectURL(objectUrl);
+
+      if (!ctx) {
+        reject(new Error("Canvas não suportado."));
+        return;
+      }
+
+      ctx.drawImage(img, 0, 0, width, height);
+      const dataUrl = canvas.toDataURL("image/jpeg", JPEG_QUALITY);
+      resolve({ base64: dataUrl.split(",")[1] ?? "", mediaType: "image/jpeg" });
     };
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error("Não foi possível processar a imagem."));
+    };
+    img.src = objectUrl;
   });
 }
 
@@ -44,7 +73,7 @@ export function InstagramUpload({ leadId, initialAnalysis, whatsappHref }: Props
       return;
     }
     if (file.size > MAX_FILE_BYTES) {
-      setError("Imagem muito grande. O limite é 5MB.");
+      setError("Imagem muito grande. O limite é 15MB.");
       return;
     }
 
@@ -52,11 +81,19 @@ export function InstagramUpload({ leadId, initialAnalysis, whatsappHref }: Props
     setLoading(true);
 
     try {
-      const imageBase64 = await fileToBase64(file);
+      const { base64: imageBase64, mediaType } = await compressImage(file);
+
+      if (imageBase64.length > 4 * 1024 * 1024) {
+        setError(
+          "Não foi possível reduzir a imagem o suficiente para enviar. Tente um print menos detalhado."
+        );
+        return;
+      }
+
       const res = await fetch(`/api/leads/${leadId}/instagram-analysis`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageBase64, mediaType: file.type }),
+        body: JSON.stringify({ imageBase64, mediaType }),
       });
 
       const data = await res.json();
