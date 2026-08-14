@@ -8,12 +8,10 @@ export function Step6Contact({ data }: Props) {
   return (
     <div className="space-y-5">
       <p className="text-sm text-ink-soft">
-        Vamos enviar seu diagnóstico para{" "}
-        <strong className="text-ink">{data.responsibleName || "você"}</strong>{" "}
-        no WhatsApp{" "}
-        <strong className="text-ink">{data.whatsappBusiness || "informado"}</strong>{" "}
-        e no e-mail{" "}
-        <strong className="text-ink">{data.contactEmail || "informado"}</strong>.
+        Prontinho,{" "}
+        <strong className="text-ink">{data.responsibleName || "você"}</strong>! Seu
+        diagnóstico personalizado vai aparecer na tela assim que você confirmar
+        abaixo.
       </p>
 
       <div className="rounded-xl border border-brand/30 bg-brand-light p-5">
