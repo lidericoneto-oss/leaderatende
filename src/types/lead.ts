@@ -49,8 +49,10 @@ export interface QuizStep1 {
   instagram: string;
   facebook: string;
   whatsappBusiness: string;
+  contactEmail: string;
   employeeCount: string;
   companyStage: CompanyStage | "";
+  consent: boolean;
 }
 
 export interface QuizStep2 {
@@ -79,9 +81,7 @@ export interface QuizStep5 {
 
 export interface QuizStep6 {
   contactName: string;
-  contactEmail: string;
   contactPhone: string;
-  consent: boolean;
 }
 
 export interface QuizData

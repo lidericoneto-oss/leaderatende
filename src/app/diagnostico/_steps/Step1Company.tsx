@@ -42,12 +42,6 @@ export function Step1Company({ data, update, showErrors }: Props) {
           placeholder="Ex: Belo Horizonte, MG"
         />
         <TextInput
-          label="Site"
-          value={data.website}
-          onChange={(v) => update({ website: v })}
-          placeholder="www.suaempresa.com.br (se possuir)"
-        />
-        <TextInput
           label="Instagram"
           value={data.instagram}
           onChange={(v) => update({ instagram: v })}
@@ -65,6 +59,14 @@ export function Step1Company({ data, update, showErrors }: Props) {
           value={data.whatsappBusiness}
           onChange={(v) => update({ whatsappBusiness: v })}
           placeholder="(00) 00000-0000"
+        />
+        <TextInput
+          label="E-mail"
+          required
+          type="email"
+          value={data.contactEmail}
+          onChange={(v) => update({ contactEmail: v })}
+          placeholder="voce@empresa.com"
         />
       </div>
 

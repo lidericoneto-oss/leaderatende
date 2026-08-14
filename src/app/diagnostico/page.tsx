@@ -56,6 +56,7 @@ function validateStep(step: number, data: QuizData): boolean {
         data.segment.trim() &&
         data.city.trim() &&
         isValidPhone(data.whatsappBusiness) &&
+        isValidEmail(data.contactEmail) &&
         data.employeeCount &&
         data.companyStage &&
         data.consent
@@ -80,7 +81,7 @@ function validateStep(step: number, data: QuizData): boolean {
         data.selfStrategy
       );
     case 5:
-      return isValidEmail(data.contactEmail);
+      return true;
     default:
       return false;
   }
@@ -222,7 +223,7 @@ export default function DiagnosticoPage() {
         {step === 3 && <Step4Challenges data={data} update={update} />}
         {step === 4 && <Step5SelfAssessment data={data} update={update} />}
         {step === 5 && (
-          <Step6Contact data={data} update={update} showErrors={showErrors} />
+          <Step6Contact data={data} />
         )}
       </div>
 
