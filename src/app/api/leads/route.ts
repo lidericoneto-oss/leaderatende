@@ -2,21 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { prisma } from "@/lib/prisma";
 import { SITE_URL } from "@/lib/config";
+import { emailRow } from "@/lib/email";
 import { calculateDiagnosis } from "@/lib/scoring";
 import { isValidEmail, isValidPhone } from "@/lib/validation";
+import type { Lead } from "@prisma/client";
 import type { QuizData } from "@/types/lead";
 
 const NOTIFY_TO = "liderico.neto@gmail.com";
 
-async function notifyCompletion(lead: {
-  id: string;
-  companyName: string;
-  responsibleName: string;
-  contactEmail: string;
-  contactPhone: string;
-  scoreGeneral: number;
-  classification: string;
-}) {
+async function notifyCompletion(lead: Lead) {
   if (!process.env.RESEND_API_KEY) return;
 
   const resend = new Resend(process.env.RESEND_API_KEY);
@@ -31,11 +25,19 @@ async function notifyCompletion(lead: {
         <div style="font-family:sans-serif;font-size:14px;color:#111;">
           <p><strong>${lead.companyName}</strong> concluiu o diagnóstico.</p>
           <table cellspacing="0" cellpadding="0">
-            <tr><td style="padding:4px 12px 4px 0;color:#6b7280;">Responsável</td><td style="padding:4px 0;">${lead.responsibleName}</td></tr>
-            <tr><td style="padding:4px 12px 4px 0;color:#6b7280;">E-mail</td><td style="padding:4px 0;">${lead.contactEmail}</td></tr>
-            <tr><td style="padding:4px 12px 4px 0;color:#6b7280;">WhatsApp</td><td style="padding:4px 0;">${lead.contactPhone}</td></tr>
-            <tr><td style="padding:4px 12px 4px 0;color:#6b7280;">Resultado</td><td style="padding:4px 0;">${lead.scoreGeneral}/100 — ${lead.classification}</td></tr>
-            <tr><td style="padding:4px 12px 4px 0;color:#6b7280;">ID</td><td style="padding:4px 0;">${lead.id}</td></tr>
+            ${emailRow("Empresa", lead.companyName)}
+            ${emailRow("Responsável", lead.responsibleName)}
+            ${emailRow("Segmento", lead.segment)}
+            ${emailRow("Cidade/região", lead.city)}
+            ${emailRow("Site", lead.website)}
+            ${emailRow("Instagram", lead.instagram)}
+            ${emailRow("Facebook", lead.facebook)}
+            ${emailRow("WhatsApp", lead.whatsappBusiness)}
+            ${emailRow("Funcionários", lead.employeeCount)}
+            ${emailRow("Estágio da empresa", lead.companyStage)}
+            ${emailRow("E-mail de contato", lead.contactEmail)}
+            ${emailRow("Resultado", `${lead.scoreGeneral}/100 — ${lead.classification}`)}
+            ${emailRow("ID", lead.id)}
           </table>
           <p style="margin-top:16px;">
             <a href="${reportUrl}" style="display:inline-block;background:#e8730c;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600;">Ver diagnóstico completo</a>
@@ -140,15 +142,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  await notifyCompletion({
-    id: lead.id,
-    companyName: lead.companyName,
-    responsibleName: lead.responsibleName,
-    contactEmail: lead.contactEmail,
-    contactPhone: lead.contactPhone,
-    scoreGeneral: lead.scoreGeneral,
-    classification: lead.classification,
-  });
+  await notifyCompletion(lead);
 
   return NextResponse.json({ id: lead.id });
 }
