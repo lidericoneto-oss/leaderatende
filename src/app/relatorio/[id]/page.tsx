@@ -134,6 +134,14 @@ export default async function RelatorioPage({
             <p className="max-w-md text-sm text-dark-ink-soft">
               {classificationSummary}
             </p>
+            <a
+              href={buildWhatsAppLink(whatsappSpecialistMessage)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 w-full rounded-lg bg-brand px-7 py-3 text-sm font-semibold text-white transition hover:bg-brand/90 sm:w-auto"
+            >
+              Quero conversar com um especialista
+            </a>
           </div>
         </section>
       </div>
@@ -156,7 +164,11 @@ export default async function RelatorioPage({
           </div>
         </section>
 
-        <InstagramUpload leadId={id} initialAnalysis={initialInstagramAnalysis} />
+        <InstagramUpload
+          leadId={id}
+          initialAnalysis={initialInstagramAnalysis}
+          whatsappHref={buildWhatsAppLink(whatsappSpecialistMessage)}
+        />
 
         <section className="mt-16">
           <h2 className="text-lg font-semibold text-ink">

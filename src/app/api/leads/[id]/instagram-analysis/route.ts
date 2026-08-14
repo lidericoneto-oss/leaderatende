@@ -15,7 +15,13 @@ const ADJUSTABLE_PILLARS: PillarKey[] = [
   "content",
 ];
 
-const SYSTEM_PROMPT = `Você é um especialista em marketing digital que analisa prints de feed/perfil do Instagram como parte de um diagnóstico de marketing para pequenas e médias empresas.
+const SUMMARY_MAX_CHARS = 220;
+const BULLET_MAX_CHARS = 100;
+const MAX_BULLETS = 4;
+
+const SYSTEM_PROMPT = `Você é um especialista em marketing digital criterioso e sincero, analisando prints de feed/perfil do Instagram como parte de um diagnóstico de marketing para pequenas e médias empresas.
+
+Seja direto e honesto na avaliação — não seja apenas simpático. Aponte problemas reais quando existirem, mesmo que o perfil pareça bom à primeira vista. O objetivo é ajudar a empresa a melhorar de verdade, não elogiar por elogiar.
 
 Responda SOMENTE com um JSON válido (sem markdown, sem texto fora do JSON) no formato exato:
 {
@@ -31,9 +37,9 @@ Responda SOMENTE com um JSON válido (sem markdown, sem texto fora do JSON) no f
 }
 
 Regras:
-- "summary": 1-2 frases em português do Brasil resumindo a impressão geral do perfil.
-- "strengths": de 1 a 4 pontos fortes observados visualmente (bullets curtos).
-- "improvements": de 1 a 4 pontos de melhoria observados visualmente (bullets curtos).
+- "summary": 1 frase curta e direta em português do Brasil (máximo 220 caracteres) resumindo a impressão geral do perfil.
+- "strengths": de 1 a 4 pontos fortes observados visualmente, cada um com no máximo 100 caracteres.
+- "improvements": de 1 a 4 pontos de melhoria observados visualmente, cada um com no máximo 100 caracteres.
 - "adjustments": ajuste inteiro entre -15 e 15 para cada pilar, representando o quanto o que você observou no print deveria mover a pontuação daquele pilar (0 ou omitido = neutro). Só inclua pilares em que o print realmente traz evidência visual.
 - Baseie-se exclusivamente no que é visível na imagem (identidade visual, grade de posts, qualidade e consistência do conteúdo, clareza da bio/comunicação, profissionalismo). Nunca invente números de seguidores, engajamento ou métricas que não estejam visíveis na imagem.
 - Se a imagem não parecer um print de Instagram, defina "adjustments" como {} e explique isso em "summary".`;
@@ -45,6 +51,12 @@ function isAllowedMediaType(value: string): value is AllowedMediaType {
 function base64ByteLength(base64: string): number {
   const padding = (base64.match(/=+$/) ?? [""])[0].length;
   return Math.floor((base64.length * 3) / 4) - padding;
+}
+
+function truncate(text: string, maxChars: number): string {
+  const trimmed = text.trim();
+  if (trimmed.length <= maxChars) return trimmed;
+  return `${trimmed.slice(0, maxChars - 1).trimEnd()}…`;
 }
 
 function parseAnalysis(raw: string): InstagramAnalysis | null {
@@ -60,12 +72,19 @@ function parseAnalysis(raw: string): InstagramAnalysis | null {
   if (typeof parsed !== "object" || parsed === null) return null;
   const obj = parsed as Record<string, unknown>;
 
-  const summary = typeof obj.summary === "string" ? obj.summary : "";
+  const summary =
+    typeof obj.summary === "string" ? truncate(obj.summary, SUMMARY_MAX_CHARS) : "";
   const strengths = Array.isArray(obj.strengths)
-    ? obj.strengths.filter((s): s is string => typeof s === "string")
+    ? obj.strengths
+        .filter((s): s is string => typeof s === "string" && s.trim().length > 0)
+        .slice(0, MAX_BULLETS)
+        .map((s) => truncate(s, BULLET_MAX_CHARS))
     : [];
   const improvements = Array.isArray(obj.improvements)
-    ? obj.improvements.filter((s): s is string => typeof s === "string")
+    ? obj.improvements
+        .filter((s): s is string => typeof s === "string" && s.trim().length > 0)
+        .slice(0, MAX_BULLETS)
+        .map((s) => truncate(s, BULLET_MAX_CHARS))
     : [];
 
   const adjustments: InstagramAdjustments = {};
@@ -138,7 +157,7 @@ export async function POST(
   try {
     const message = await anthropic.messages.create({
       model: "claude-sonnet-5",
-      max_tokens: 1024,
+      max_tokens: 500,
       system: SYSTEM_PROMPT,
       messages: [
         {
