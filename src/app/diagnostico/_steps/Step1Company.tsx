@@ -6,9 +6,10 @@ import type { QuizData } from "@/types/lead";
 interface Props {
   data: QuizData;
   update: (patch: Partial<QuizData>) => void;
+  showErrors: boolean;
 }
 
-export function Step1Company({ data, update }: Props) {
+export function Step1Company({ data, update, showErrors }: Props) {
   return (
     <div className="space-y-5">
       <div className="grid gap-5 sm:grid-cols-2">
@@ -82,6 +83,28 @@ export function Step1Company({ data, update }: Props) {
         value={data.companyStage}
         onChange={(v) => update({ companyStage: v as QuizData["companyStage"] })}
       />
+
+      <label className="flex items-start gap-3 rounded-lg border border-border bg-surface p-4 text-sm text-ink-soft">
+        <input
+          type="checkbox"
+          checked={data.consent}
+          onChange={(e) => update({ consent: e.target.checked })}
+          className="mt-0.5 h-4 w-4 shrink-0 rounded border-border accent-brand"
+        />
+        <span>
+          Concordo em receber o diagnóstico e informações relacionadas à análise
+          realizada, conforme a{" "}
+          <a href="/privacidade" className="text-brand underline">
+            política de privacidade
+          </a>
+          .
+        </span>
+      </label>
+      {showErrors && !data.consent && (
+        <p className="text-xs text-critico">
+          É necessário concordar para receber o diagnóstico.
+        </p>
+      )}
     </div>
   );
 }

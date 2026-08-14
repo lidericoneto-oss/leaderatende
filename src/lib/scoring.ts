@@ -34,8 +34,6 @@ function scorePositioning(data: QuizData): number {
     0.5 * scale1to5(data.selfDifferentiation) +
     0.5 * scale1to5(data.selfProfessionalism);
 
-  if (has(data.challenges, "Minha comunicação é parecida com a dos concorrentes"))
-    score -= 12;
   if (has(data.challenges, "Meu perfil não transmite profissionalismo")) score -= 12;
   if (
     has(
@@ -43,8 +41,6 @@ function scorePositioning(data: QuizData): number {
       "Minha empresa é boa, mas não consigo demonstrar isso nas redes"
     )
   )
-    score -= 8;
-  if (has(data.challenges, "Não tenho uma identidade visual consistente"))
     score -= 8;
 
   if (data.companyStage === "Negócio recém-iniciado") score -= 5;
@@ -57,10 +53,7 @@ function scoreCommunication(data: QuizData): number {
   let score =
     0.6 * scale1to5(data.selfClarity) + 0.4 * scale1to5(data.selfProfessionalism);
 
-  if (has(data.challenges, "Não sei o que publicar")) score -= 10;
   if (has(data.challenges, "Meu perfil não transmite profissionalismo")) score -= 8;
-  if (has(data.challenges, "Minha comunicação é parecida com a dos concorrentes"))
-    score -= 8;
 
   return clamp(score);
 }
@@ -102,11 +95,6 @@ function scoreContent(data: QuizData): number {
   };
   let score = frequencyBase[data.postFrequency] ?? 50;
 
-  if (has(data.challenges, "Tenho dificuldade para criar conteúdo")) score -= 10;
-  if (has(data.challenges, "Não sei o que publicar")) score -= 10;
-  if (has(data.challenges, "Não consigo manter regularidade")) score -= 10;
-  if (has(data.challenges, "Não tenho uma identidade visual consistente"))
-    score -= 8;
   if (has(data.challenges, "Tenho pouco tempo para cuidar do marketing"))
     score -= 6;
 
@@ -117,8 +105,6 @@ function scoreConversion(data: QuizData): number {
   let score = 0.6 * scale1to5(data.selfSalesConversion) + 0.4 * 50;
 
   if (has(data.challenges, "Tenho seguidores, mas poucas vendas")) score -= 15;
-  if (has(data.challenges, "Não sei como transformar seguidores em clientes"))
-    score -= 15;
 
   if (has(data.channels, "WhatsApp")) score += 8;
   if (data.whatsappBusiness && data.whatsappBusiness.trim().length > 0)
@@ -297,30 +283,18 @@ const PRIORITY_CONTENT: Record<PillarKey, { title: string; description: string }
 };
 
 const CHALLENGE_ACTIONS: Record<string, string> = {
-  "Tenho dificuldade para criar conteúdo":
-    "Criar uma linha editorial simples para orientar as publicações",
-  "Meu perfil não transmite profissionalismo":
-    "Revisar a apresentação visual do perfil (bio, destaques, identidade)",
-  "Não sei o que publicar":
-    "Definir temas e formatos de conteúdo alinhados ao objetivo da empresa",
+  "Meu marketing não tem estratégia":
+    "Definir uma estratégia de marketing com objetivos e prioridades claras",
+  "Tenho pouco tempo para cuidar do marketing":
+    "Estruturar um processo ou rotina que não dependa apenas do seu tempo",
+  "Não sei se meus investimentos estão dando resultado":
+    "Implementar acompanhamento de resultados dos investimentos em marketing",
   "Tenho seguidores, mas poucas vendas":
     "Estruturar um caminho claro entre o conteúdo e o contato comercial",
   "Minha empresa é boa, mas não consigo demonstrar isso nas redes":
     "Traduzir os diferenciais reais da empresa em conteúdo e comunicação",
-  "Meu marketing não tem estratégia":
-    "Definir uma estratégia de marketing com objetivos e prioridades claras",
-  "Não sei se meus investimentos estão dando resultado":
-    "Implementar acompanhamento de resultados dos investimentos em marketing",
-  "Minha comunicação é parecida com a dos concorrentes":
-    "Revisar o posicionamento para diferenciar a comunicação da concorrência",
-  "Tenho pouco tempo para cuidar do marketing":
-    "Estruturar um processo ou rotina que não dependa apenas do seu tempo",
-  "Não consigo manter regularidade":
-    "Criar um planejamento de publicações para manter regularidade",
-  "Não tenho uma identidade visual consistente":
-    "Padronizar a identidade visual usada nas redes sociais",
-  "Não sei como transformar seguidores em clientes":
-    "Estruturar melhor o caminho até o WhatsApp",
+  "Meu perfil não transmite profissionalismo":
+    "Revisar a apresentação visual do perfil (bio, destaques, identidade)",
 };
 
 const PILLAR_FALLBACK_ACTIONS: Record<PillarKey, string> = {

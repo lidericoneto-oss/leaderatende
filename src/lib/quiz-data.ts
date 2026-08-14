@@ -81,19 +81,12 @@ export const OBJECTIVE_OPTIONS = [
 export const MAX_OBJECTIVES = 3;
 
 export const CHALLENGE_OPTIONS = [
-  "Tenho dificuldade para criar conteúdo",
-  "Meu perfil não transmite profissionalismo",
-  "Não sei o que publicar",
+  "Meu marketing não tem estratégia",
+  "Tenho pouco tempo para cuidar do marketing",
+  "Não sei se meus investimentos estão dando resultado",
   "Tenho seguidores, mas poucas vendas",
   "Minha empresa é boa, mas não consigo demonstrar isso nas redes",
-  "Meu marketing não tem estratégia",
-  "Não sei se meus investimentos estão dando resultado",
-  "Minha comunicação é parecida com a dos concorrentes",
-  "Tenho pouco tempo para cuidar do marketing",
-  "Não consigo manter regularidade",
-  "Não tenho uma identidade visual consistente",
-  "Não sei como transformar seguidores em clientes",
-  "Outro",
+  "Meu perfil não transmite profissionalismo",
 ];
 
 export const MAX_CHALLENGES = 3;

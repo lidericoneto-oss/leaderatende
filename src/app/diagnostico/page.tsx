@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ProgressBar } from "@/components/ProgressBar";
@@ -55,9 +55,10 @@ function validateStep(step: number, data: QuizData): boolean {
         data.responsibleName.trim() &&
         data.segment.trim() &&
         data.city.trim() &&
-        data.whatsappBusiness.trim() &&
+        isValidPhone(data.whatsappBusiness) &&
         data.employeeCount &&
-        data.companyStage
+        data.companyStage &&
+        data.consent
       );
     case 1:
       return !!(
@@ -79,12 +80,7 @@ function validateStep(step: number, data: QuizData): boolean {
         data.selfStrategy
       );
     case 5:
-      return !!(
-        data.contactName.trim() &&
-        isValidEmail(data.contactEmail) &&
-        isValidPhone(data.contactPhone) &&
-        data.consent
-      );
+      return isValidEmail(data.contactEmail);
     default:
       return false;
   }
@@ -100,6 +96,7 @@ export default function DiagnosticoPage() {
   const [submitError, setSubmitError] = useState("");
   const [leadId, setLeadId] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  const step1NotifiedRef = useRef(false);
 
   useEffect(() => {
     // localStorage só existe no client; ler aqui (em vez de no lazy initializer do
@@ -133,6 +130,28 @@ export default function DiagnosticoPage() {
     }
     setShowErrors(false);
 
+    if (step === 0 && !step1NotifiedRef.current) {
+      step1NotifiedRef.current = true;
+      fetch("/api/leads/step1-notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          companyName: data.companyName,
+          responsibleName: data.responsibleName,
+          segment: data.segment,
+          city: data.city,
+          website: data.website,
+          instagram: data.instagram,
+          facebook: data.facebook,
+          whatsappBusiness: data.whatsappBusiness,
+          employeeCount: data.employeeCount,
+          companyStage: data.companyStage,
+        }),
+      }).catch(() => {
+        // notificação por e-mail é best-effort; não deve travar o quiz
+      });
+    }
+
     if (step < TOTAL_STEPS - 1) {
       setStep((s) => s + 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -145,7 +164,11 @@ export default function DiagnosticoPage() {
       const res = await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          contactName: data.responsibleName,
+          contactPhone: data.whatsappBusiness,
+        }),
       });
       const body = await res.json();
       if (!res.ok) {
@@ -191,7 +214,9 @@ export default function DiagnosticoPage() {
       </div>
 
       <div className="mt-8 rounded-2xl border border-border bg-surface p-5 shadow-sm sm:p-7">
-        {step === 0 && <Step1Company data={data} update={update} />}
+        {step === 0 && (
+          <Step1Company data={data} update={update} showErrors={showErrors} />
+        )}
         {step === 1 && <Step2Digital data={data} update={update} />}
         {step === 2 && <Step3Objectives data={data} update={update} />}
         {step === 3 && <Step4Challenges data={data} update={update} />}
