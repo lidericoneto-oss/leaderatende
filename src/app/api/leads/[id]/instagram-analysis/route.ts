@@ -161,10 +161,11 @@ export async function POST(
     responseText = textBlock?.type === "text" ? textBlock.text : "";
   } catch (err) {
     console.error("Instagram analysis request failed:", err);
-    return NextResponse.json(
-      { error: "Não foi possível analisar a imagem agora. Tente novamente." },
-      { status: 502 }
-    );
+    const message =
+      err instanceof Error && err.message.includes("image dimensions exceed max allowed size")
+        ? "A imagem tem uma resolução muito alta. Tente enviar um print direto do celular (sem editar ou ampliar)."
+        : "Não foi possível analisar a imagem agora. Tente novamente.";
+    return NextResponse.json({ error: message }, { status: 502 });
   }
 
   const analysis = parseAnalysis(responseText);
