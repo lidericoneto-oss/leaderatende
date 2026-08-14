@@ -105,7 +105,6 @@ export default async function RelatorioPage({
     }[classification] ?? "";
 
   const whatsappSpecialistMessage = `Olá! Acabei de fazer o diagnóstico de marketing da ${lead.companyName} e tive o resultado ${scoreGeneral}/100. Gostaria de conversar sobre os próximos passos.`;
-  const whatsappReceiveMessage = `Olá! Gostaria de receber o diagnóstico da ${lead.companyName} (resultado ${scoreGeneral}/100) pelo WhatsApp.`;
 
   return (
     <div className="min-h-screen pb-24">
@@ -248,14 +247,6 @@ export default async function RelatorioPage({
               className="w-full rounded-lg bg-brand px-7 py-3 text-sm font-semibold text-white transition hover:bg-brand/90 sm:w-auto"
             >
               Quero conversar com um especialista
-            </a>
-            <a
-              href={buildWhatsAppLink(whatsappReceiveMessage)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full rounded-lg border border-border px-7 py-3 text-sm font-semibold text-ink transition hover:border-brand hover:text-brand sm:w-auto"
-            >
-              Receber meu diagnóstico no WhatsApp
             </a>
           </div>
         </section>
