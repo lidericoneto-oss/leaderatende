@@ -8,6 +8,7 @@ import { ProcessingScreen } from "@/components/ProcessingScreen";
 import { Logo } from "@/components/Logo";
 import { STEP_TITLES, TOTAL_STEPS } from "@/lib/quiz-data";
 import { isValidEmail, isValidPhone } from "@/lib/validation";
+import { trackLead } from "@/lib/pixel";
 import type { QuizData } from "@/types/lead";
 import { Step1Company } from "./_steps/Step1Company";
 import { Step2Digital } from "./_steps/Step2Digital";
@@ -177,6 +178,7 @@ export default function DiagnosticoPage() {
         setSubmitting(false);
         return;
       }
+      trackLead();
       setLeadId(body.id);
       localStorage.removeItem(DRAFT_KEY);
       setProcessing(true);
