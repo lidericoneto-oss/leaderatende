@@ -89,6 +89,7 @@ export default async function RelatorioPage({
 
   const initialInstagramAnalysis: InstagramAnalysis | null = lead.instagramAnalysis
     ? {
+        actionPlan: [],
         ...JSON.parse(lead.instagramAnalysis),
         adjustments: instagramAdjustments ?? {},
       }

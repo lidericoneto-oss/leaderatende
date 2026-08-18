@@ -160,6 +160,27 @@ export function InstagramUpload({ leadId, initialAnalysis, whatsappHref }: Props
             )}
           </div>
 
+          {analysis.actionPlan.length > 0 && (
+            <div className="mt-5">
+              <p className="text-xs font-semibold text-brand uppercase">
+                Plano de ação imediato
+              </p>
+              <ol className="mt-2 space-y-2">
+                {analysis.actionPlan.map((item, i) => (
+                  <li
+                    key={item}
+                    className="flex items-start gap-3 rounded-lg bg-surface p-3"
+                  >
+                    <span className="text-sm font-bold text-brand">
+                      {i + 1}
+                    </span>
+                    <span className="text-sm text-ink">{item}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
+
           <a
             href={whatsappHref}
             target="_blank"

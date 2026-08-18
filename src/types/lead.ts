@@ -138,6 +138,7 @@ export interface InstagramAnalysis {
   summary: string;
   strengths: string[];
   improvements: string[];
+  actionPlan: string[];
   adjustments: InstagramAdjustments;
 }
 

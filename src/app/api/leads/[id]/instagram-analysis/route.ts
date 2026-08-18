@@ -18,19 +18,29 @@ const ADJUSTABLE_PILLARS: PillarKey[] = [
   "content",
 ];
 
-const SUMMARY_MAX_CHARS = 220;
-const BULLET_MAX_CHARS = 100;
+const SUMMARY_MAX_CHARS = 420;
+const BULLET_MAX_CHARS = 170;
 const MAX_BULLETS = 4;
+const MAX_ACTION_ITEMS = 3;
 
-const SYSTEM_PROMPT = `Você é um especialista em marketing digital criterioso e sincero, analisando prints de feed/perfil do Instagram como parte de um diagnóstico de marketing para pequenas e médias empresas.
+const SYSTEM_PROMPT = `Atue como um Especialista em Marketing Digital, Branding e Estratégia de Posicionamento. Você recebe um print da página inicial do Instagram de um cliente (ou potencial cliente) como parte de um diagnóstico de marketing para pequenas e médias empresas. Seu objetivo é fazer uma auditoria visual e estratégica desse perfil, avaliando como ele comunica o valor da marca e sua capacidade de atrair e reter o público certo.
 
-Seja direto e honesto na avaliação — não seja apenas simpático. Aponte problemas reais quando existirem, mesmo que o perfil pareça bom à primeira vista. O objetivo é ajudar a empresa a melhorar de verdade, não elogiar por elogiar.
+Tom e voz: postura consultiva, profissional e encorajadora. Seja empático, mas direto e honesto sobre o que não está funcionando — não seja apenas simpático, e não elogie por elogiar. Ao apontar um problema, explique por que aquilo prejudica o negócio (ex: "Isso confunde o visitante" ou "Isso reduz a percepção de valor"). Seja assertivo e conclusivo: evite linguagem hesitante como "pode ser", "talvez" ou "aparenta". A linguagem deve ser clara, persuasiva e voltada para negócios e conversão.
+
+O que analisar rigorosamente, quando visível no print:
+1. Foto de perfil: transmite profissionalismo? Se for logo, é legível em tamanho pequeno? Se for foto pessoal, o enquadramento e a expressão comunicam autoridade?
+2. Nome de usuário (@) e nome principal: são fáceis de buscar? O nome principal usa palavras-chave do nicho?
+3. Bio: a proposta de valor fica clara em 3 segundos? Dá pra entender o que a empresa vende e para quem? Há uma chamada para ação clara?
+4. Link na bio: existe um link estratégico direcionando pro próximo passo (WhatsApp, site, landing page)?
+5. Destaques: estão organizados, com capas seguindo a identidade visual e temas estratégicos (Quem Somos, Serviços, Depoimentos)?
+6. Grid/feed (primeiros posts visíveis): há consistência visual (cores, tipografia), alta qualidade de imagem, e equilíbrio entre venda, educação e conexão — ou parece só um panfleto digital?
 
 Responda SOMENTE com um JSON válido (sem markdown, sem texto fora do JSON) no formato exato:
 {
   "summary": string,
   "strengths": string[],
   "improvements": string[],
+  "actionPlan": string[],
   "adjustments": {
     "positioning"?: number,
     "communication"?: number,
@@ -40,11 +50,12 @@ Responda SOMENTE com um JSON válido (sem markdown, sem texto fora do JSON) no f
 }
 
 Regras:
-- "summary": 1 frase curta e direta em português do Brasil (máximo 220 caracteres) resumindo a impressão geral do perfil.
-- "strengths": de 1 a 4 pontos fortes observados visualmente, cada um com no máximo 100 caracteres.
-- "improvements": de 1 a 4 pontos de melhoria observados visualmente, cada um com no máximo 100 caracteres.
+- "summary" (Visão Geral): 2 a 3 frases diretas e assertivas em português do Brasil (máximo 420 caracteres) resumindo a primeira impressão que o perfil passa nos primeiros 3 segundos.
+- "strengths" (Pontos Fortes — o que manter): 2 a 3 acertos reais do perfil, para validar o esforço do cliente, cada um com no máximo 170 caracteres.
+- "improvements" (Pontos de Atrito — o que trava o crescimento): de 1 a 4 fraquezas visuais/estratégicas, cada uma explicando o impacto negativo no negócio, com no máximo 170 caracteres.
+- "actionPlan" (Plano de Ação Imediato — quick wins): exatamente 3 mudanças práticas e específicas que o cliente pode aplicar hoje (sugestões concretas de copy ou design, não genéricas), cada uma com no máximo 170 caracteres.
 - "adjustments": ajuste inteiro entre -15 e 15 para cada pilar, representando o quanto o que você observou no print deveria mover a pontuação daquele pilar (0 ou omitido = neutro). Só inclua pilares em que o print realmente traz evidência visual.
-- Baseie-se exclusivamente no que é visível na imagem (identidade visual, grade de posts, qualidade e consistência do conteúdo, clareza da bio/comunicação, profissionalismo). Nunca invente números de seguidores, engajamento ou métricas que não estejam visíveis na imagem.
+- Baseie-se exclusivamente no que é visível na imagem. Nunca invente números de seguidores, engajamento ou métricas que não estejam visíveis na imagem.
 - Se a imagem não parecer um print de Instagram, defina "adjustments" como {} e explique isso em "summary".`;
 
 function isAllowedMediaType(value: string): value is AllowedMediaType {
@@ -89,6 +100,12 @@ function parseAnalysis(raw: string): InstagramAnalysis | null {
         .slice(0, MAX_BULLETS)
         .map((s) => truncate(s, BULLET_MAX_CHARS))
     : [];
+  const actionPlan = Array.isArray(obj.actionPlan)
+    ? obj.actionPlan
+        .filter((s): s is string => typeof s === "string" && s.trim().length > 0)
+        .slice(0, MAX_ACTION_ITEMS)
+        .map((s) => truncate(s, BULLET_MAX_CHARS))
+    : [];
 
   const adjustments: InstagramAdjustments = {};
   if (typeof obj.adjustments === "object" && obj.adjustments !== null) {
@@ -103,7 +120,7 @@ function parseAnalysis(raw: string): InstagramAnalysis | null {
 
   if (!summary) return null;
 
-  return { summary, strengths, improvements, adjustments };
+  return { summary, strengths, improvements, actionPlan, adjustments };
 }
 
 export async function POST(
@@ -160,7 +177,7 @@ export async function POST(
   try {
     const message = await anthropic.messages.create({
       model: "claude-haiku-4-5-20251001",
-      max_tokens: 500,
+      max_tokens: 900,
       system: SYSTEM_PROMPT,
       messages: [
         {
@@ -206,6 +223,7 @@ export async function POST(
           summary: analysis.summary,
           strengths: analysis.strengths,
           improvements: analysis.improvements,
+          actionPlan: analysis.actionPlan,
         }),
         instagramAdjustments: JSON.stringify(analysis.adjustments),
         instagramAnalyzedAt: new Date(),

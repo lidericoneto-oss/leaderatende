@@ -146,6 +146,12 @@ export async function generateReportPdf(data: ReportPdfData) {
       addText("Pontos de melhoria", { bold: true, size: 9.5, color: AMBER });
       data.instagramAnalysis.improvements.forEach((s) => addText(`• ${s}`, { size: 9.5 }));
     }
+    if (data.instagramAnalysis.actionPlan.length > 0) {
+      addText("Plano de ação imediato", { bold: true, size: 9.5, color: BRAND });
+      data.instagramAnalysis.actionPlan.forEach((s, i) =>
+        addText(`${i + 1}. ${s}`, { size: 9.5, color: INK })
+      );
+    }
   }
 
   // Respostas do questionário
