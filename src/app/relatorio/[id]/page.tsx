@@ -5,6 +5,7 @@ import { buildWhatsAppLink } from "@/lib/config";
 import { ScoreGauge } from "@/components/report/ScoreGauge";
 import { PillarBar } from "@/components/report/PillarBar";
 import { InstagramUpload } from "@/components/report/InstagramUpload";
+import { DownloadPdfButton } from "@/components/report/DownloadPdfButton";
 import { Logo } from "@/components/Logo";
 import { applyInstagramAdjustments, describePillar } from "@/lib/scoring";
 import type {
@@ -248,6 +249,18 @@ export default async function RelatorioPage({
             >
               Quero conversar com um especialista
             </a>
+            <DownloadPdfButton
+              data={{
+                lead,
+                pillars,
+                priorities,
+                recommendations,
+                scoreGeneral,
+                classification,
+                classificationSummary,
+                instagramAnalysis: initialInstagramAnalysis,
+              }}
+            />
           </div>
         </section>
       </main>
