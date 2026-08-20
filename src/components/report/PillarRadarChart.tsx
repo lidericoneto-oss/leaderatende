@@ -4,10 +4,15 @@ interface Props {
   pillars: Pillar[];
 }
 
-const SIZE = 260;
+const SIZE = 320;
 const CENTER = SIZE / 2;
-const MAX_RADIUS = 88;
+const MAX_RADIUS = 76;
 const RINGS = [0.25, 0.5, 0.75, 1];
+
+// Rótulos curtos pro gráfico (o card de cada pilar já mostra o nome completo).
+const SHORT_LABELS: Record<string, string> = {
+  "Presença Digital": "Presença",
+};
 
 function pointAt(index: number, total: number, radius: number): [number, number] {
   const angle = (Math.PI * 2 * index) / total - Math.PI / 2;
@@ -31,7 +36,7 @@ export function PillarRadarChart({ pillars }: Props) {
     <div className="flex justify-center">
       <svg
         viewBox={`0 0 ${SIZE} ${SIZE}`}
-        className="h-auto w-full max-w-xs"
+        className="h-auto w-full max-w-xs overflow-visible"
         aria-hidden="true"
       >
         {ringPolygons.map((points, i) => (
@@ -84,7 +89,7 @@ export function PillarRadarChart({ pillars }: Props) {
         })}
 
         {pillars.map((pillar, i) => {
-          const [x, y] = pointAt(i, total, MAX_RADIUS + 22);
+          const [x, y] = pointAt(i, total, MAX_RADIUS + 24);
           const anchor = x < CENTER - 8 ? "end" : x > CENTER + 8 ? "start" : "middle";
           return (
             <text
@@ -96,7 +101,7 @@ export function PillarRadarChart({ pillars }: Props) {
               className="fill-ink-soft"
               style={{ fontSize: "10px", fontWeight: 600 }}
             >
-              {pillar.label}
+              {SHORT_LABELS[pillar.label] ?? pillar.label}
             </text>
           );
         })}
