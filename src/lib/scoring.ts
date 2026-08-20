@@ -249,6 +249,21 @@ export function describePillar(key: PillarKey, score: number): string {
   return PILLAR_DESCRIPTIONS[key][bandOf(score)];
 }
 
+export const PILLAR_TIPS: Record<PillarKey, string> = {
+  positioning:
+    "Escreva em uma frase o que diferencia sua empresa da concorrência e use essa frase na bio e nos destaques do Instagram.",
+  communication:
+    "Releia sua bio como se fosse a primeira vez que alguém vê seu perfil: em 3 segundos, dá pra entender o que você vende e para quem?",
+  digitalPresence:
+    "Escolha 1 ou 2 canais prioritários e publique com constância neles, em vez de tentar manter presença fraca em todos ao mesmo tempo.",
+  content:
+    "Defina 3 temas fixos de conteúdo (ex: bastidores, prova social, educativo) e alterne entre eles nas publicações da semana.",
+  conversion:
+    "Deixe um link ou botão direto de WhatsApp na bio e nos destaques, reduzindo a distância entre curiosidade e contato.",
+  strategy:
+    "Escolha 1 métrica principal para acompanhar todo mês (ex: nº de contatos pelo WhatsApp) para saber se o marketing está funcionando.",
+};
+
 const PRIORITY_CONTENT: Record<PillarKey, { title: string; description: string }> = {
   positioning: {
     title: "Estruturar o posicionamento",

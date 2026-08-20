@@ -191,14 +191,43 @@ export function InstagramUpload({ leadId, initialAnalysis, whatsappHref }: Props
           </a>
         </div>
       ) : (
-        <div className="mt-5 rounded-xl border border-border bg-surface p-5">
-          <div className="flex flex-col items-start gap-4 sm:flex-row">
+        <div className="mt-5 rounded-2xl bg-brand p-6 text-white sm:p-7">
+          <div className="flex items-start gap-4">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-6 w-6"
+                aria-hidden="true"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="5" />
+                <circle cx="12" cy="12.5" r="4" />
+                <circle cx="16.8" cy="7.2" r="0.6" fill="currentColor" stroke="none" />
+              </svg>
+            </span>
+            <div>
+              <p className="font-semibold">
+                Envie um print da tela inicial do seu perfil no Instagram
+              </p>
+              <p className="mt-1 text-sm text-white/85">
+                Numa única captura, mostre a foto de perfil, a bio, os
+                destaques e a grade de posts — é a partir disso que a análise
+                é feita.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-5 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
             {preview && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={preview}
                 alt="Prévia do print enviado"
-                className="h-32 w-32 shrink-0 rounded-lg border border-border object-cover"
+                className="h-32 w-32 shrink-0 rounded-lg border-2 border-white/30 object-cover"
               />
             )}
 
@@ -214,14 +243,16 @@ export function InstagramUpload({ leadId, initialAnalysis, whatsappHref }: Props
               />
               <label
                 htmlFor="instagram-print-input"
-                className={`inline-flex cursor-pointer items-center rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand/90 ${
+                className={`inline-flex cursor-pointer items-center rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-brand transition hover:bg-white/90 ${
                   loading ? "pointer-events-none opacity-60" : ""
                 }`}
               >
                 {loading ? "Analisando..." : "Enviar print do Instagram"}
               </label>
 
-              {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+              {error && (
+                <p className="mt-3 text-sm font-medium text-white">{error}</p>
+              )}
             </div>
           </div>
         </div>

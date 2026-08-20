@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { buildWhatsAppLink } from "@/lib/config";
 import { ScoreGauge } from "@/components/report/ScoreGauge";
 import { PillarBar } from "@/components/report/PillarBar";
+import { PillarRadarChart } from "@/components/report/PillarRadarChart";
+import { PillarIcon } from "@/components/report/PillarIcon";
 import { InstagramUpload } from "@/components/report/InstagramUpload";
 import { DownloadPdfButton } from "@/components/report/DownloadPdfButton";
 import { Logo } from "@/components/Logo";
@@ -152,6 +154,13 @@ export default async function RelatorioPage({
           <h2 className="text-lg font-semibold text-ink">
             Seu resultado por pilar
           </h2>
+          <p className="mt-1 max-w-xl text-sm text-ink-soft">
+            Visão geral dos 6 pilares que avaliamos — quanto mais cheio o
+            desenho, mais estruturado está aquele lado do seu marketing.
+          </p>
+          <div className="mt-6 rounded-xl border border-border bg-surface p-5">
+            <PillarRadarChart pillars={pillars} />
+          </div>
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
             {pillars.map((pillar) => (
               <PillarBar
@@ -181,9 +190,14 @@ export default async function RelatorioPage({
                 key={priority.pillarKey}
                 className="rounded-xl border border-border bg-surface p-5"
               >
-                <span className="text-xs font-semibold text-brand">
-                  PRIORIDADE {priority.rank}
-                </span>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-brand">
+                    PRIORIDADE {priority.rank}
+                  </span>
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-light text-brand">
+                    <PillarIcon pillarKey={priority.pillarKey} className="h-4 w-4" />
+                  </span>
+                </div>
                 <h3 className="mt-1.5 text-sm font-semibold text-ink">
                   {priority.title}
                 </h3>
